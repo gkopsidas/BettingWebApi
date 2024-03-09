@@ -54,3 +54,6 @@ Contains all classes describing entities, DTOs and DbContext. For bigger project
 Contains repositories (MatchRepository) that interact with DB (CRUD operations). MatchOddRepository.cs would be implemented in a similar way.
 In GetMatches we could implement more operations such as miltifield filtering and grouping. For now only simple operations are implemented such as
 paging, contains filter of Description and sorting based on MatchDate.
+
+Thank you for your time 😃,
+John

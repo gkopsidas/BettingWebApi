@@ -25,43 +25,68 @@ namespace BettingApi.Services.Repositories
         {
             //Without join MatchOdds
             //var response = await _dbContext.Matches.FirstOrDefaultAsync(x => x.Id == id);
-
+            
             var match = await _dbContext.Matches
-               .Join(_dbContext.MatchOdds,
-                     p => p.Id,
-                     e => e.MatchId,
-                     (p, e) => new
-                     {
-                         Id = p.Id,
-                         Description = p.Description,
-                         MatchDate = p.MatchDate,
-                         MatchTime = p.MatchTime,
-                         Sport = p.Sport,
-                         TeamA = p.TeamA,
-                         TeamB = p.TeamB,
-                         OddId = e.Id,
-                         Odd = e.Odd,
-                         Specifier = e.Specifier
-                     })
-               .GroupBy(x => x.Id)
-               .Select(p => new Match
-               {
-                   Id = p.Key,
-                   Description = p.First().Description,
-                   MatchDate = p.First().MatchDate,
-                   MatchTime = p.First().MatchTime,
-                   Sport = p.First().Sport,
-                   TeamA = p.First().TeamA,
-                   TeamB = p.First().TeamB,
-                   MatchOdds = p.Select(x => new MatchOdd
-                   {
-                       Id = x.OddId,
-                       Odd = x.Odd,
-                       MatchId = x.Id,
-                       Specifier = x.Specifier
-                   }).ToList()
-               })
+                .Where(x => x.Id == id)
+                .Select(p => new Match
+                {
+                    Id = p.Id,
+                    Description = p.Description,
+                    MatchDate = p.MatchDate,
+                    MatchTime = p.MatchTime,
+                    Sport = p.Sport,
+                    TeamA = p.TeamA,
+                    TeamB = p.TeamB,
+                    MatchOdds = _dbContext.MatchOdds
+                        .Where(x => x.MatchId == id)
+                        .Select(x => new MatchOdd
+                        {
+                            Id = x.Id,
+                            Odd = x.Odd,
+                            MatchId = x.Id,
+                            Specifier = x.Specifier
+                        }).ToList()
+                })
                .FirstOrDefaultAsync();
+
+            //This does not gets Match with zero related Match Odds
+            //var match = await _dbContext.Matches
+            //   .Where(x => x.Id == id)
+            //   .Join(_dbContext.MatchOdds,
+            //         p => p.Id,
+            //         e => e.MatchId,
+            //         (p, e) => new
+            //         {
+            //             Id = p.Id,
+            //             Description = p.Description,
+            //             MatchDate = p.MatchDate,
+            //             MatchTime = p.MatchTime,
+            //             Sport = p.Sport,
+            //             TeamA = p.TeamA,
+            //             TeamB = p.TeamB,
+            //             OddId = e.Id,
+            //             Odd = e.Odd,
+            //             Specifier = e.Specifier
+            //         })
+            //   .GroupBy(x => x.Id)
+            //   .Select(p => new Match
+            //   {
+            //       Id = p.Key,
+            //       Description = p.First().Description,
+            //       MatchDate = p.First().MatchDate,
+            //       MatchTime = p.First().MatchTime,
+            //       Sport = p.First().Sport,
+            //       TeamA = p.First().TeamA,
+            //       TeamB = p.First().TeamB,
+            //       MatchOdds = p.Select(x => new MatchOdd
+            //       {
+            //           Id = x.OddId,
+            //           Odd = x.Odd,
+            //           MatchId = x.Id,
+            //           Specifier = x.Specifier
+            //       }).ToList()
+            //   })
+            //   .FirstOrDefaultAsync();
 
             return match;
         }
